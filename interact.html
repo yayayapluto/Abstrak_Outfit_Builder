@@ -13,7 +13,7 @@
     <link rel="preload" href="./assets/top.webp" as="image">
     <link rel="preload" href="./assets/bottom.webp" as="image">
     <script defer src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script defer src="https://unpkg.com/draggabilly@3/dist/draggabilly.pkgd.min.js"></script>
+    <script defer src="https://unpkg.com/interactjs@1.10.27/dist/interact.min.js"></script>
     <title>Outfit Builder 1.0</title>
 </head>
 
@@ -25,11 +25,11 @@
             <div id="draggabilly-preview"
                 class="relative h-full w-full flex flex-col items-center justify-center bg-no-repeat bg-center bg-contain"
                 style="background-image: url(./assets/outline.svg);">
-                <div class="draggable size-88 cursor-move z-10">
+                <div class="draggable size-88 cursor-move z-10 hover:border-1 border-dotted" data-x="0" data-y="0">
                     <img src="./assets/top.webp" id="top-clothing-preview" alt="Top clothing"
                         class="object-contain w-full h-full" fetchpriority="high">
                 </div>
-                <div class="draggable size-90 cursor-move z-0 ">
+                <div class="draggable size-90 cursor-move z-0 hover:border-1 border-dotted" data-x="0" data-y="0">
                     <img src="./assets/bottom.webp" id="bottom-clothing-preview" alt="Bottom clothing"
                         class="object-contain w-full h-full" fetchpriority="high">
                 </div>
@@ -73,14 +73,33 @@
         })
 
         document.addEventListener("DOMContentLoaded", () => {
-            const draggableElems = document.querySelectorAll('.draggable');
-            const draggies = [];
-            for (const elem of draggableElems) {
-                const draggie = new Draggabilly(elem, {
-                    containment: '#draggabilly-preview-container'
+            interact('.draggable')
+                .draggable({
+                    inertia: true,
+                    autoScroll: false,
+                    modifiers: [
+                        interact.modifiers.restrictRect({
+                            restriction: '#draggabilly-preview-container',
+                            endOnly: true
+                        })
+                    ],
+                    listeners: {
+                        move(event) {
+                            const target = event.target;
+                            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                            target.style.transform = `translate(${x}px, ${y}px)`;
+                            target.setAttribute('data-x', x);
+                            target.setAttribute('data-y', y);
+                        },
+                        start(event) {
+                            if (event.type === 'touchstart') {
+                                event.preventDefault();
+                            }
+                        }
+                    },
+                    preventDefault: 'always'
                 });
-                draggies.push(draggie);
-            }
 
             const mens_catalog = {
                 top: [
@@ -122,19 +141,22 @@
             const womensCatalogBottoms = document.getElementById("womens-catalog-bottoms");
 
             const params = new URLSearchParams(window.location.search);
-            const upper = params.get("atasan");
-            const bottom = params.get("bawahan");
+            const upper = params.get("atasan")
+            const bottom = params.get("bawahan")
+
+            const upper_preview = document.getElementById("top-clothing-preview")
+            const bottom_preview = document.getElementById("bottom-clothing-preview")
 
             const men_upper = mens_catalog.top.find(({ id }) => upper === id)?.path;
             const women_upper = womens_catalog.top.find(({ id }) => upper === id)?.path;
             if (men_upper || women_upper) {
-                topClothingPreview.src = `./assets/${men_upper || women_upper}`;
+                upper_preview.src = `./assets/${men_upper || women_upper}`;
             }
 
             const men_bottom = mens_catalog.bottom.find(({ id }) => bottom === id)?.path;
             const women_bottom = womens_catalog.bottom.find(({ id }) => bottom === id)?.path;
             if (men_bottom || women_bottom) {
-                bottomClothingPreview.src = `./assets/${men_bottom || women_bottom}`;
+                bottom_preview.src = `./assets/${men_bottom || women_bottom}`;
             }
 
             const renderCatalogItems = (catalog, container, previewElement, paramName) => {
@@ -143,13 +165,13 @@
                     div.className = 'cursor-pointer size-36 border border-black border-dotted hover:scale-110 transition-transform duration-200 ease-out';
                     div.innerHTML = `<img src="./assets/${item.path}" alt="img for ${item.id}" class="object-contain size-full" loading="lazy">`;
                     div.addEventListener("click", () => {
-                        params.set(paramName, item.id);
-                        window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+                        params.set(paramName, item.id)
+                        window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`)
                         previewElement.src = `./assets/${item.path}`;
                     });
                     container.append(div);
                 });
-            };
+            }
 
             renderCatalogItems(mens_catalog.top, mensCatalogTops, topClothingPreview, "atasan");
             renderCatalogItems(mens_catalog.bottom, mensCatalogBottoms, bottomClothingPreview, "bawahan");

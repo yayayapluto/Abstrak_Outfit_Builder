@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Special Package</title>
+</head>
+
+<body class="min-h-screen w-full bg-gray-100 font-mono">
+    <main class="flex flex-col p-4 sm:p-8 md:p-16 items-center justify-center gap-8 w-full max-w-7xl mx-auto">
+        <h3 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-center">Special Package</h3>
+        <div id="special-package-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+            <div id="special-package-detail"
+                class="flex flex-col gap-4 items-start w-full bg-white p-4 rounded-lg shadow-sm">
+                <div id="special-package-detail-img" class="w-full">
+                    <img src="../assets/placeholder/image.png" class="w-full aspect-[4/3] object-cover rounded-md"
+                        alt="Special Package">
+                </div>
+                <div id="special-package-detail-description" class="flex flex-col gap-2">
+                    <h4 class="text-xl font-semibold">Special Package 1</h4>
+                    <h4 class="text-lg text-gray-700">Rp 125.000</h4>
+                </div>
+            </div>
+            <div id="special-package-list" class="flex flex-col justify-between gap-6">
+                <div id="special-package-list-description" class="bg-white p-4 rounded-lg shadow-sm">
+                    <h4 class="text-lg font-semibold">Description</h4>
+                    <p class="text-gray-600 mt-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias
+                        similique voluptate dolore quidem cum totam voluptas molestiae aperiam dolorum natus.</p>
+                    <p class="text-blue-600 underline cursor-pointer mt-2 hover:text-blue-800">see more</p>
+                </div>
+                <div id="special-package-actual-list"
+                    class="bg-white p-4 rounded-lg shadow-sm flex-1 overflow-y-auto space-y-4 max-h-80">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const outfit_sets = [
+                {
+                    name: "item name 1",
+                    description: "whatever",
+                    price: "Rp xxx.xxx,xx",
+                    image: "placeholder/image.png"
+                },
+                {
+                    name: "item name 2",
+                    description: "whatever",
+                    price: "Rp xxx.xxx,xx",
+                    image: "placeholder/image.png"
+                },
+                {
+                    name: "item name 3",
+                    description: "whatever",
+                    price: "Rp xxx.xxx,xx",
+                    image: "placeholder/image.png"
+                },
+                {
+                    name: "item name 4",
+                    description: "whatever",
+                    price: "Rp xxx.xxx,xx",
+                    image: "placeholder/image.png"
+                },
+                {
+                    name: "item name 5",
+                    description: "whatever",
+                    price: "Rp xxx.xxx,xx",
+                    image: "placeholder/image.png"
+                },
+            ];
+
+            let highlighted_package = outfit_sets[0];
+
+            const specialPackageActualList_container = document.querySelector("#special-package-actual-list");
+
+            const showDetailPackage = () => {
+                const specialPackageDetail_container = document.querySelector("#special-package-detail");
+                specialPackageDetail_container.innerHTML = `
+                    <div id="special-package-detail-img" class="w-full">
+                        <img src="../assets/${highlighted_package.image}" class="w-full aspect-[4/3] object-cover rounded-md" alt="Special Package">
+                    </div>
+                    <div id="special-package-detail-description" class="flex flex-col gap-2">
+                        <h4 class="text-xl font-semibold">${highlighted_package.name}</h4>
+                        <h4 class="text-lg text-gray-700">${highlighted_package.price}</h4>
+                    </div>
+                `;
+            };
+
+            outfit_sets.forEach((item) => {
+                let div = document.createElement("div");
+                div.className = "flex flex-col sm:flex-row justify-between gap-4 cursor-pointer hover:bg-gray-100 p-2 rounded-md";
+                div.innerHTML = `
+                    <div class="h-20">
+                        <img src="../assets/${item.image}" class="size-full aspect-video object-cover rounded-md" alt="List Item">
+                    </div>
+                    <div class="flex-1">
+                        <h5 class="text-lg font-semibold">${item.name}</h5>
+                        <p class="text-gray-600">${item.description}</p>
+                    </div>
+                `;
+                div.addEventListener("click", () => {
+                    highlighted_package = item;
+                    showDetailPackage();
+                });
+                specialPackageActualList_container.append(div);
+            });
+
+            showDetailPackage();
+        });
+    </script>
+</body>
+
+</html>
